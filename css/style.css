@@ -42,3 +42,8 @@ button {
   	background-color: #5fc7e3;
   	cursor: pointer;
 }
+
+
+button[state=hiddenCard] { background-color: #5fc7e3; }
+button[state=activeCard] { background-color: green; }
+button[state=matchingCard] { background-color: orange; }

@@ -1,24 +1,12 @@
 const timeElapsed = document.getElementById('time-elapsed');
 const moves = document.getElementById('moves');
-// const stars = document.getElementById('stars');
+const score = document.getElementById('score');
 const refresh = document.getElementById('refresh');
 const cards = document.getElementById('cards');
-let time, movesCount, activeCards = [];
+let time, movesCount, activeCards = [], matchingCardsCount;
 
 
-// 2 states: none, temporary, permanent
-// 3 card stages: hiddenCard, activeCard, matchingCard
-
-
-
-function myFunction() {
-  var x = document.getElementById("myDIV");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
+// 3 card states: hiddenCard, activeCard, matchingCard
 
 
 const showCard = (btn) => {
@@ -28,34 +16,41 @@ const showCard = (btn) => {
 		}
 	}
 
+	const gameOver = () => {
+		// stop timer
+
+		// show score
+		let currentScore = Math.ceil(movesCount / time * 100);
+		score.innerHTML = `Score: ${currentScore}`;
+	}
+
 	btn.innerHTML = btn.getAttribute('value');
 	btn.setAttribute('state', 'activeCard');
-	
-	// if (activeCards.length > 1) {
-	// 	activeCards = [];
-	// }
-	// activeCards.push(btn);
+
+	activeCards.push(btn);
 
 	if (activeCards.length === 2) {
-		if (activeCards[0].value !== activeCards[1].value) {
-			console.log(activeCards[0].value, activeCards[1].value);
+		if (activeCards[0].value === activeCards[1].value) {
 			setCardsAttribute('state', 'matchingCard', activeCards);
+			activeCards[0].disabled = true;
+			activeCards[1].disabled = true;
+			matchingCardsCount += 2;
+			if (matchingCardsCount === 16) {
+				gameOver();
+			}
 		} else {
 			setCardsAttribute('state', 'hiddenCard', activeCards);
 		}
 		activeCards = [];
 	} 
-	activeCards.push(btn);
-	
-	
-	
+		
 }
+
 
 const generateCard = (value) => {
 	var btn = document.createElement('button');
 	btn.setAttribute('value', value);
 	btn.setAttribute('state', 'hiddenCard');
-	// btn.setAttribute('isTurned', false);
 	btn.innerHTML = 'Card';
 	btn.addEventListener('click', () => {
 		movesCount++
@@ -67,38 +62,48 @@ const generateCard = (value) => {
 
 
 const generateCards = () => {
-	for (let i = 1; i <= 16; i++) {
-		generateCard(i);
+	const cardValues = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8];
+	// IIFE to shuffle the card values
+	(function () {
+	    for (let i = cardValues.length - 1; i > 0; i--) {
+	        const j = Math.floor(Math.random() * (i + 1));
+	        [cardValues[i], cardValues[j]] = [cardValues[j], cardValues[i]];
+	    }
+	})();
+	for (let card of cardValues) {
+		generateCard(card);
 	}
 }
 
 
-const updateTimeView = (minutes, seconds) => {
-	timeElapsed.innerHTML = `Time Elapsed: ${minutes}m ${seconds}s`
+const updateTimeView = (seconds) => {
+	let min = Math.floor(seconds / 60);
+	let sec = seconds - 60 * min;
+	timeElapsed.innerHTML = `Time Elapsed: ${min}m ${sec}s`
 }
 
 
-const startTimer = () => {
+const setTimer = () => {
 	console.log('Started timer!');
-	cards.removeEventListener('click', startTimer);
+	cards.removeEventListener('click', setTimer);
 	time = 0;
 	const timer = setInterval(() => {
 		time++
-		let minutes = Math.floor(time / 60);
-		let seconds = time - 60 * minutes;
-		updateTimeView(minutes, seconds);
+		updateTimeView(time);
 	}, 1000);
 	refresh.addEventListener('click', () => clearInterval(timer));
 }
 
 
 const refreshGame = () => {
-	updateTimeView(0, 0);
+	updateTimeView(0);
 	movesCount = 0;
+	score.innerHTML = 'Score:';
+	matchingCardsCount = 0;
 	moves.innerHTML = `Moves: ${movesCount}`;
 	cards.innerHTML = '';
 	generateCards();
-	cards.addEventListener('click', startTimer);
+	cards.addEventListener('click', setTimer);
 }
 
 
