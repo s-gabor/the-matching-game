@@ -1,20 +1,66 @@
-const cards = document.getElementById('cards');
-const moves = document.getElementById('moves');
-const refresh = document.getElementById('refresh');
 const timeElapsed = document.getElementById('time-elapsed');
-let movesCount;
-let time;
+const moves = document.getElementById('moves');
+// const stars = document.getElementById('stars');
+const refresh = document.getElementById('refresh');
+const cards = document.getElementById('cards');
+let time, movesCount, activeCards = [];
+
+
+// 2 states: none, temporary, permanent
+// 3 card stages: hiddenCard, activeCard, matchingCard
 
 
 
+function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
 
 
-const generateCard = (id) => {
+const showCard = (btn) => {
+	const setCardsAttribute = (attrName, attrValue, cards) => {
+		for (let card of cards) {
+			card.setAttribute(attrName, attrValue);
+		}
+	}
+
+	btn.innerHTML = btn.getAttribute('value');
+	btn.setAttribute('state', 'activeCard');
+	
+	// if (activeCards.length > 1) {
+	// 	activeCards = [];
+	// }
+	// activeCards.push(btn);
+
+	if (activeCards.length === 2) {
+		if (activeCards[0].value !== activeCards[1].value) {
+			console.log(activeCards[0].value, activeCards[1].value);
+			setCardsAttribute('state', 'matchingCard', activeCards);
+		} else {
+			setCardsAttribute('state', 'hiddenCard', activeCards);
+		}
+		activeCards = [];
+	} 
+	activeCards.push(btn);
+	
+	
+	
+}
+
+const generateCard = (value) => {
 	var btn = document.createElement('button');
-	btn.innerHTML = `Card ${id}`;
+	btn.setAttribute('value', value);
+	btn.setAttribute('state', 'hiddenCard');
+	// btn.setAttribute('isTurned', false);
+	btn.innerHTML = 'Card';
 	btn.addEventListener('click', () => {
 		movesCount++
 		moves.innerHTML = `Moves: ${movesCount}`;
+		showCard(btn);
 	})
 	cards.appendChild(btn);
 }
@@ -66,30 +112,3 @@ refresh.addEventListener('click', refreshGame);
 
 
 
-// var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
-
-// // Update the count down every 1 second
-// var x = setInterval(function() {
-
-//   // Get todays date and time
-//   var now = new Date().getTime();
-    
-//   // Find the distance between now and the count down date
-//   var distance = countDownDate - now;
-    
-//   // Time calculations for days, hours, minutes and seconds
-//   var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-//   var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-//   var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-//   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    
-//   // Output the result in an element with id="demo"
-//   document.getElementById("demo").innerHTML = days + "d " + hours + "h "
-//   + minutes + "m " + seconds + "s ";
-    
-//   // If the count down is over, write some text 
-//   if (distance < 0) {
-//     clearInterval(x);
-//     document.getElementById("demo").innerHTML = "EXPIRED";
-//   }
-// }, 1000);
